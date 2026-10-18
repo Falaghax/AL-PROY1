@@ -1,22 +1,35 @@
-package encription.Matrix;
-
-import java.math.BigInteger;
-
 public final class GridOperations {
     /**
      * Calculates the determinant of a matrix using cofactor expansion along the first column.
-     * Result is normalized mod 29.
      * 
      * @param grid the matrix
-     * @return the determinant mod 29
+     * @return the determinant
      */
     public static double calculateDet(double[][] grid){
         double det = 0;
         for(int i = 0; i < grid.length; i++){
             det += grid[i][0] * calculateCofactor(grid, i, 0);
         }
-        return det % 29;
+        return det;
     } 
+
+    public static double[][] calculateTecnologyMatrix(double[][] matrix) {
+        double[][] identity = new double[matrix.length][matrix.length];
+
+        int i = 0,j = 0;
+
+        while(i < identity.length) {
+            identity[i++][j++] = 1;
+        }
+
+        for(i = 0; i < matrix.length; i++){
+            for (j = 0; j < matrix.length; j++) {
+                matrix[i][j] = identity[i][j] - matrix[i][j];
+            }
+        }
+
+        return matrix;
+    }
 
     /**
      * Calculates the cofactor of an element at position (row, column).
@@ -88,17 +101,17 @@ public final class GridOperations {
     }
 
     /**
-     * Calculates the cofactor matrix (all cofactors) and normalizes values modulo 29.
-     * 
+     * Calculates the cofactor matrix (all cofactors).
+     *
      * @param grid the original matrix
-     * @return the cofactor matrix with all values mod 29
+     * @return the cofactor matrix
      */
     public static double[][] findCofactors(double[][] grid){
         double[][] newGrid = new double[grid.length][grid.length];
 
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid.length; j++) {
-                newGrid[i][j] = (calculateCofactor(grid, i, j) + 29) % 29;
+                newGrid[i][j] = (calculateCofactor(grid, i, j));
             }
         }
 
@@ -150,17 +163,16 @@ public final class GridOperations {
     }
 
     /**
-     * Calculates the inverse matrix using the adjugate method and modular arithmetic (mod 29).
+     * Calculates the inverse matrix using the adjugate method.
      * Returns null if matrix is singular (determinant = 0).
-     * 
+     *
      * @param grid the matrix to invert
      * @return the inverted matrix, or null if singular
      */
     public static double[][] findInverse(double[][] grid) {
-        BigInteger det = BigInteger.valueOf((int) calculateDet(grid));
-        if(det.equals(0)) return null;
-        BigInteger result = det.modPow(BigInteger.valueOf(27), BigInteger.valueOf(29));
+        double det = calculateDet(grid);
+        if(det == 0) return null;
 
-        return multiplyGrids(result.intValue(), transposeGrid(findCofactors(grid)));
+        return multiplyGrids(1 / det, transposeGrid(findCofactors(grid)));
     }
 }
